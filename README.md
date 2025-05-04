@@ -32,8 +32,8 @@ This project provides a (hopefully) less stressful boilerplate for building Node
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository-url>
-    cd <repository-directory>
+    git clone https://github.com/heyjunin/micro-stress
+    cd micro-stress
     ```
 
 2.  **Install dependencies:**
