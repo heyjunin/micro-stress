@@ -3,3 +3,23 @@ description:
 globs:
 alwaysApply: false
 ---
+# Observability (Tracing & Logging)
+
+This rule describes the observability features: OpenTelemetry tracing and Pino logging.
+
+## Distributed Tracing
+- **Setup:** OpenTelemetry SDK initialized in [bootstrap/tracing.js](mdc:bootstrap/tracing.js).
+- **Exporter:** Uses OTLP exporter (configured via `OTEL_EXPORTER_OTLP_ENDPOINT`) to send traces to the collector.
+- **Instrumentation:** Auto-instrumentation for Fastify, Knex, HTTP, Redis (via packages listed in [package.json](mdc:package.json)).
+- **Collector:** Defined in [docker-compose.yml](mdc:docker-compose.yml) (`otel-collector`), configured by [otel-collector-config.yml](mdc:otel-collector-config.yml), exports to Jaeger.
+- **UI:** Jaeger UI accessible at `http://localhost:8081` (default).
+
+## Structured Logging
+- **Logger:** Pino, integrated with Fastify ([bootstrap/fastify.js](mdc:bootstrap/fastify.js)). Log level set by `LOG_LEVEL` env var.
+- **Trace Correlation:** **Trace ID (`trace_id`) and Span ID (`span_id`) are automatically injected** into logs via `formatters.log` in [bootstrap/fastify.js](mdc:bootstrap/fastify.js) for easy correlation.
+- **Output:**
+  - Development (`npm run dev`): Human-readable via `pino-pretty`.
+  - Production (`npm start`): Raw JSON.
+- **Usage:** Use `request.log` in handlers or `fastify.log` elsewhere.
+
+See [docs/06-observability.md](mdc:docs/06-observability.md) for more details.

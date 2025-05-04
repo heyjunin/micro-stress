@@ -3,3 +3,26 @@ description:
 globs:
 alwaysApply: false
 ---
+# Project Structure
+
+This rule outlines the main directories and their purpose:
+
+- **[bootstrap](mdc:bootstrap):** Initialization for core components (Fastify, DB, Tracing). See [bootstrap/fastify.js](mdc:bootstrap/fastify.js), [bootstrap/database.js](mdc:bootstrap/database.js), [bootstrap/tracing.js](mdc:bootstrap/tracing.js).
+- **[cli](mdc:cli):** Helper scripts for common tasks (status, db check, migrations). See [cli/status.js](mdc:cli/status.js), [cli/check-db.js](mdc:cli/check-db.js), [cli/migrations.js](mdc:cli/migrations.js).
+- **[config](mdc:config):** Environment variable loading and validation. Schema in [config/env.js](mdc:config/env.js), main export in [config/index.js](mdc:config/index.js).
+- **[database](mdc:database):** Knex migrations ([database/migrations](mdc:database/migrations)) and seeds ([database/seeds](mdc:database/seeds)). Knex config: [knexfile.js](mdc:knexfile.js).
+- **[modules](mdc:modules):** Feature/domain modules (e.g., [modules/contacts](mdc:modules/contacts)).
+  - `*.controller.js`: Handles HTTP requests/responses.
+  - `*.model.js`: Database interaction logic.
+  - `*.service.js`: Business logic, uses model, publishes events.
+  - `*.routes.js`: Defines API routes and validation schemas.
+  - `*.test.js`, `*.e2e.test.js`: Unit and end-to-end tests.
+- **[core](mdc:core):** Shared functionalities like the Event Bus ([core/event-bus.js](mdc:core/event-bus.js)).
+- **[src](mdc:src):** Main application entry point ([src/server.js](mdc:src/server.js)) which uses the bootstrap scripts.
+- **[docs](mdc:docs):** Project documentation.
+
+Other important files:
+- [.env.example](mdc:.env.example), `.env`, `.env.test`: Environment configuration.
+- [docker-compose.yml](mdc:docker-compose.yml): Defines external services.
+- [otel-collector-config.yml](mdc:otel-collector-config.yml): OpenTelemetry Collector config.
+- [package.json](mdc:package.json): Project dependencies and scripts.

@@ -3,3 +3,34 @@ description:
 globs:
 alwaysApply: false
 ---
+# CLI Tools
+
+This rule summarizes the available CLI tools defined in [package.json](mdc:package.json) and the [cli](mdc:cli) directory.
+
+## Database (Knex Wrappers)
+- `npm run db:migrate:make <name>`
+- `npm run db:migrate:latest`
+- `npm run db:migrate:rollback`
+- `npm run db:seed:make <name>`
+- `npm run db:seed:run`
+
+## Custom Helpers ([cli](mdc:cli) directory)
+- `npm run cli:status`: Display current config ([cli/status.js](mdc:cli/status.js)).
+- `npm run cli:check-db`: Test DB connection ([cli/check-db.js](mdc:cli/check-db.js)).
+- `npm run cli:migrations:status`: Show migration status ([cli/migrations.js](mdc:cli/migrations.js)).
+
+## Development Workflow
+- `npm run db:migrate:fresh`: Rollback all migrations, then run all migrations.
+- `npm run db:migrate:fresh:seed`: Run `db:migrate:fresh`, then `db:seed:run`.
+
+## Docker Compose Wrappers
+- `npm run docker:up`: Start services (`docker compose up -d`).
+- `npm run docker:down`: Stop and remove containers/networks.
+- `npm run docker:stop`: Stop containers.
+- `npm run docker:prune`: **DANGER:** Stop/remove containers AND volumes (data loss).
+- `npm run docker:build`: Build images.
+- `npm run docker:build:nc`: Build images (no cache).
+- `npm run docker:ps`: List containers.
+- `npm run docker:logs`: Follow logs.
+
+See [docs/09-cli-tools.md](mdc:docs/09-cli-tools.md) for more details.

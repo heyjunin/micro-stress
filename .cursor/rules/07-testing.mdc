@@ -3,3 +3,26 @@ description:
 globs:
 alwaysApply: false
 ---
+# Testing with Vitest
+
+This rule covers the testing strategy using Vitest for unit and E2E tests.
+
+- **Runner:** Vitest (scripts in [package.json](mdc:package.json): `test`, `test:watch`).
+- **Environment:**
+  - `NODE_ENV=test` is set.
+  - Configuration loaded from `.env.test`.
+  - Test DB (`micro_stress_db_test`) created by `npm run test:setup:db` script in [package.json](mdc:package.json) before tests run.
+- **Unit Tests (`*.test.js`):**
+  - Location: Alongside source code (e.g., [modules/contacts/contacts.test.js](mdc:modules/contacts/contacts.test.js)).
+  - Purpose: Test units in isolation.
+  - **Mocking:** Uses `vi.mock()` and `vitest-mock-extended`. Dependencies like models ([modules/contacts/contacts.model.js](mdc:modules/contacts/contacts.model.js)) and event bus ([core/event-bus.js](mdc:core/event-bus.js)) are mocked.
+- **E2E Tests (`*.e2e.test.js`):**
+  - Location: Within module directories (e.g., [modules/contacts/contacts.e2e.test.js](mdc:modules/contacts/contacts.e2e.test.js)).
+  - Purpose: Test full API request/response cycles against real services (test DB, Redis).
+  - **Tools:** `supertest` for HTTP requests/assertions.
+  - **Setup/Teardown:**
+    - `beforeAll`: Initialize Fastify app ([bootstrap/fastify.js](mdc:bootstrap/fastify.js)), DB connection ([bootstrap/database.js](mdc:bootstrap/database.js)), run `db.migrate.latest()`.
+    - `beforeEach`: `db('table_name').truncate()` to clear data.
+    - `afterAll`: `db.migrate.rollback()`, `db.destroy()`, disconnect event bus ([core/event-bus.js](mdc:core/event-bus.js)), `app.close()`. **Order is important for cleanup.**
+
+See [docs/08-testing.md](mdc:docs/08-testing.md) for more details.

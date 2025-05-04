@@ -3,3 +3,23 @@ description:
 globs:
 alwaysApply: false
 ---
+# Event Bus (Redis Pub/Sub)
+
+This rule explains the event bus implementation using Redis Pub/Sub for decoupled communication.
+
+- **Setup:**
+  - Redis instance provided by `redis` service in [docker-compose.yml](mdc:docker-compose.yml).
+  - Connection managed in [core/event-bus.js](mdc:core/event-bus.js), using `REDIS_URL` from config.
+  - Separate `publisher` and `subscriber` clients are created.
+  - Provides `publish`, `subscribe`, and `disconnectEventBus` functions.
+- **Publishing:**
+  - Use the `publish(channel, message)` function from [core/event-bus.js](mdc:core/event-bus.js).
+  - Typically called from the service layer (e.g., [modules/contacts/contacts.service.js](mdc:modules/contacts/contacts.service.js)) after successful operations.
+  - **Important:** `message` payload **must be stringified** (e.g., `JSON.stringify(payload)`).
+- **Subscribing (Listening):**
+  - Use the `subscribe(channel, handler)` function from [core/event-bus.js](mdc:core/event-bus.js).
+  - Handler function receives `(channel, message)`. Remember to parse the `message` string (e.g., `JSON.parse(message)`).
+  - Set up subscriptions during application startup, potentially in a dedicated file like `bootstrap/event-listeners.js` (example provided in docs, but file not implemented yet) called from [src/server.js](mdc:src/server.js).
+- **Graceful Shutdown:** Call `disconnectEventBus()` during application shutdown (e.g., Fastify `onClose` hook).
+
+See [docs/07-event-bus.md](mdc:docs/07-event-bus.md) for more details.

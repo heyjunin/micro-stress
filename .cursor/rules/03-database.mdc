@@ -3,3 +3,26 @@ description:
 globs:
 alwaysApply: false
 ---
+# Database (Knex)
+
+This rule covers database interactions using Knex.js with PostgreSQL.
+
+- **Configuration:** Defined in [knexfile.js](mdc:knexfile.js), using validated environment variables from [config/index.js](mdc:config/index.js).
+- **Initialization:** Knex instance is initialized and exported from [bootstrap/database.js](mdc:bootstrap/database.js) (`initializeDatabase`, `getDatabaseInstance`).
+- **Migrations:**
+  - Location: [database/migrations](mdc:database/migrations)
+  - Create: `npm run db:migrate:make <name>`
+  - Run: `npm run db:migrate:latest`
+  - Rollback: `npm run db:migrate:rollback` (last batch) or `npx knex migrate:rollback --all` (all)
+  - Status: `npm run cli:migrations:status` ([cli/migrations.js](mdc:cli/migrations.js))
+  - Fresh Reset (Dev): `npm run db:migrate:fresh` or `npm run db:migrate:fresh:seed`.
+- **Seeds:**
+  - Location: [database/seeds](mdc:database/seeds)
+  - Create: `npm run db:seed:make <name>`
+  - Run: `npm run db:seed:run`
+  - Example: [database/seeds/initial_contacts.seed.js](mdc:database/seeds/initial_contacts.seed.js) uses Faker.
+- **Usage (Model Layer):**
+  - Database queries are typically performed in module model files (e.g., [modules/contacts/contacts.model.js](mdc:modules/contacts/contacts.model.js)).
+  - Models get the Knex instance via `getDatabaseInstance()` from [bootstrap/database.js](mdc:bootstrap/database.js).
+
+See [docs/04-database.md](mdc:docs/04-database.md) for more details.

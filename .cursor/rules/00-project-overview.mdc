@@ -3,3 +3,26 @@ description:
 globs:
 alwaysApply: false
 ---
+# Project Overview and Setup
+
+This project is a Node.js microservice boilerplate using Fastify, Knex, OpenTelemetry, PostgreSQL, and Redis.
+
+## Core Technologies:
+- **Framework:** Fastify ([src/server.js](mdc:src/server.js), [bootstrap/fastify.js](mdc:bootstrap/fastify.js))
+- **Database:** PostgreSQL with Knex ([bootstrap/database.js](mdc:bootstrap/database.js), [knexfile.js](mdc:knexfile.js), [database/migrations](mdc:database/migrations), [database/seeds](mdc:database/seeds))
+- **Configuration:** Dotenv + Zod validation ([config/env.js](mdc:config/env.js), [config/index.js](mdc:config/index.js), [.env.example](mdc:.env.example))
+- **Observability:** OpenTelemetry ([bootstrap/tracing.js](mdc:bootstrap/tracing.js)) + Pino Logger (integrated in Fastify) + Jaeger/OTel Collector ([docker-compose.yml](mdc:docker-compose.yml), [otel-collector-config.yml](mdc:otel-collector-config.yml))
+- **Event Bus:** Redis Pub/Sub ([core/event-bus.js](mdc:core/event-bus.js))
+- **Testing:** Vitest + Supertest ([modules/contacts/contacts.test.js](mdc:modules/contacts/contacts.test.js), [modules/contacts/contacts.e2e.test.js](mdc:modules/contacts/contacts.e2e.test.js))
+- **API Docs:** Fastify Swagger (configured in [bootstrap/fastify.js](mdc:bootstrap/fastify.js), schemas in module routes like [modules/contacts/contacts.routes.js](mdc:modules/contacts/contacts.routes.js))
+- **Containerization:** Docker Compose for dependencies ([docker-compose.yml](mdc:docker-compose.yml))
+
+## Setup:
+1. Clone, `npm install`.
+2. Configure via `.env` (copy from [.env.example](mdc:.env.example)).
+3. Start services: `npm run docker:up`.
+4. Run migrations: `npm run db:migrate:latest`.
+5. Run seeds (optional): `npm run db:seed:run`.
+6. Start app: `npm run dev`.
+
+See full documentation in the [docs](mdc:docs) directory, starting with [docs/README.md](mdc:docs/README.md). The main project README is [README.md](mdc:README.md).
