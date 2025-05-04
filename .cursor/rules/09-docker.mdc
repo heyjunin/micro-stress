@@ -1,0 +1,21 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Docker Usage
+
+This rule describes how Docker and Docker Compose are used for development dependencies.
+
+- **Configuration:** [docker-compose.yml](mdc:docker-compose.yml)
+- **Services Defined:**
+  - `redis`: Event bus ([core/event-bus.js](mdc:core/event-bus.js)). Port 6379.
+  - `jaeger`: Tracing UI. Port 8081.
+  - `otel-collector`: Receives traces from app ([bootstrap/tracing.js](mdc:bootstrap/tracing.js)), exports to Jaeger. Config: [otel-collector-config.yml](mdc:otel-collector-config.yml). Port 4318 (HTTP OTLP).
+  - `postgres`: Database ([bootstrap/database.js](mdc:bootstrap/database.js), [knexfile.js](mdc:knexfile.js)). Port 5432.
+- **Network:** `micro-stress-net` allows service discovery by name (e.g., `micro-stress-postgres`).
+- **Volumes:** `postgres_data`, `redis_data` ensure data persistence (unless pruned).
+- **Management:** Use `npm run docker:*` scripts (see [package.json](mdc:package.json) and [docs/09-cli-tools.md](mdc:docs/09-cli-tools.md)) or `docker compose` commands.
+- **Application Containerization:** **Currently NO [Dockerfile](mdc:Dockerfile)** for the Node.js app itself. The app runs on the host and connects to services in Docker.
+
+See [docs/10-docker.md](mdc:docs/10-docker.md) for more details.

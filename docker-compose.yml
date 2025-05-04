@@ -1,0 +1,110 @@
+networks:
+  micro-stress-net:
+    driver: bridge
+
+# Define o volume para persistência do banco de dados
+volumes:
+  postgres_data:
+  redis_data: # Add volume definition for Redis persistence
+
+services:
+  # Serviço Redis (Pub/Sub Broker)
+  redis:
+    container_name: micro-stress-redis
+    image: redis:7-alpine # Use a recent, lightweight image
+    restart: always
+    ports:
+      - target: 6379 # Internal Redis port
+        published: 6379 # Expose on host
+        protocol: tcp
+        mode: host
+    volumes:
+      - redis_data:/data # Persist Redis data (optional for Pub/Sub, useful for Streams)
+    networks:
+      - micro-stress-net
+
+  # Serviço do Jaeger (Distributed Tracing UI)
+  jaeger:
+    container_name: micro-stress-jaeger # Nome do container
+    image: jaegertracing/all-in-one:latest # Imagem a ser usada
+    restart: always # Política de reinicialização
+    ports:
+      # Mapeamento de portas (long syntax): host:container
+      - target: 16686 # Porta interna do Jaeger UI
+        published: 8081 # Porta exposta no host
+        protocol: tcp
+        mode: host
+      - target: 14268 # Porta interna (collector http)
+        published: 14268
+        protocol: tcp
+        mode: host
+      - target: 14250 # Porta interna (collector grpc) - Exposta apenas internamente por padrão
+        protocol: tcp
+        mode: host
+    networks: # Conecta à rede customizada
+      - micro-stress-net
+
+  # Serviço do Coletor OpenTelemetry
+  otel-collector:
+    container_name: micro-stress-otel-collector # Nome do container
+    image: otel/opentelemetry-collector:latest # Imagem a ser usada
+    restart: always # Política de reinicialização
+    volumes:
+      # Mapeamento de volume para o arquivo de configuração (long syntax)
+      - type: bind
+        source: ./otel-collector-config.yml
+        target: /etc/otel-collector-config.yml
+        read_only: true # Configuração não deve ser alterada pelo container
+    ports:
+      # Mapeamento de portas (long syntax)
+      - target: 4317 # OTLP gRPC receiver
+        published: 4317
+        protocol: tcp
+        mode: host
+      - target: 4318 # OTLP HTTP receiver
+        published: 4318
+        protocol: tcp
+        mode: host
+      # Portas de extensões (opcional expor no host)
+      # - target: 1888 # pprof extension
+      #   published: 1888
+      #   protocol: tcp
+      #   mode: host
+      # - target: 13133 # health_check extension
+      #   published: 13133
+      #   protocol: tcp
+      #   mode: host
+      # - target: 55679 # zpages extension
+      #   published: 55679
+      #   protocol: tcp
+      #   mode: host
+    command: ["--config=/etc/otel-collector-config.yml"] # Comando para iniciar o coletor
+    depends_on: # Garante que o Jaeger inicie antes
+      - jaeger
+    networks: # Conecta à rede customizada
+      - micro-stress-net
+
+  # Serviço do Banco de Dados PostgreSQL
+  postgres:
+    container_name: micro-stress-postgres # Nome do container (opcional, mas ajuda na identificação)
+    image: postgres:14 # Imagem a ser usada
+    restart: always # Política de reinicialização
+    environment: # Variáveis de ambiente para configuração do PG
+      POSTGRES_DB: micro_stress_db
+      POSTGRES_USER: heyjunin
+      POSTGRES_PASSWORD: erick
+      TZ: America/Sao_Paulo
+      PGTZ: America/Sao_Paulo
+    ports:
+      # Mapeamento de portas (long syntax)
+      - target: 5432 # Porta interna do PG
+        published: 5432 # Porta exposta no host
+        protocol: tcp
+        mode: host
+    volumes:
+      # Mapeamento de volume nomeado para persistência (long syntax)
+      - type: volume
+        source: postgres_data # Nome do volume definido no top-level
+        target: /var/lib/postgresql/data
+    networks: # Conecta à rede customizada
+      - micro-stress-net

@@ -1,0 +1,20 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# API Development Workflow
+
+This rule guides adding new API features following the modular pattern.
+
+1.  **Create Module Directory:** `mkdir modules/<new_feature>` (e.g., [modules/contacts](mdc:modules/contacts)).
+2.  **Create Module Files:**
+    - `*.model.js`: Database interaction (uses Knex from [bootstrap/database.js](mdc:bootstrap/database.js)). See [modules/contacts/contacts.model.js](mdc:modules/contacts/contacts.model.js).
+    - `*.service.js`: Business logic (uses model, publishes events via [core/event-bus.js](mdc:core/event-bus.js)). See [modules/contacts/contacts.service.js](mdc:modules/contacts/contacts.service.js).
+    - `*.controller.js`: Handles HTTP request/response (uses service). See [modules/contacts/contacts.controller.js](mdc:modules/contacts/contacts.controller.js).
+    - `*.routes.js`: Defines Fastify routes, schemas (Zod), and connects to controller handlers. See [modules/contacts/contacts.routes.js](mdc:modules/contacts/contacts.routes.js).
+3.  **Register Routes:** Import and register the module's routes file in [src/server.js](mdc:src/server.js) using `fastify.register(..., { prefix: '/api/...' })`.
+4.  **Validation/Serialization:** Define Zod schemas within the `*.routes.js` file for `body`, `querystring`, `params`, and `response`. These are used for automatic request validation and response serialization by Fastify.
+5.  **API Documentation (Swagger):** Schemas defined in routes automatically generate Swagger documentation, accessible at `/documentation`. Enhance docs using `summary`, `description`, `tags` in the schema object.
+
+See [docs/05-api-development.md](mdc:docs/05-api-development.md) for more details.

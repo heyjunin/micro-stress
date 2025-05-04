@@ -1,0 +1,73 @@
+{
+  "name": "micro-stress",
+  "version": "1.0.0",
+  "description": "Boilerplate for Node.js microservices with less stress (Fastify, Knex, OpenTelemetry, PostgreSQL)",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js | pino-pretty -t 'HH:MM:ss Z' -i pid,hostname",
+    "lint": "echo \"Lint script not configured yet\"",
+    "test:setup:db": "docker compose exec -T postgres psql -U heyjunin -d postgres -c 'CREATE DATABASE micro_stress_db_test;' || echo 'Test database already exists or could not be created.'",
+    "test": "npm run test:setup:db && vitest run",
+    "test:watch": "vitest",
+    "db:migrate:make": "npx knex migrate:make --knexfile knexfile.js -x js",
+    "db:migrate:latest": "npx knex migrate:latest --knexfile knexfile.js",
+    "db:migrate:rollback": "npx knex migrate:rollback --knexfile knexfile.js",
+    "db:seed:make": "npx knex seed:make --knexfile knexfile.js -x js",
+    "db:seed:run": "npx knex seed:run --knexfile knexfile.js",
+    "cli:status": "node cli/status.js",
+    "cli:check-db": "node cli/check-db.js",
+    "cli:migrations:status": "node cli/migrations.js",
+    "db:migrate:fresh": "echo '⚠️ Dropping all tables and re-running migrations...' && npx knex migrate:rollback --all --knexfile knexfile.js && npx knex migrate:latest --knexfile knexfile.js",
+    "db:migrate:fresh:seed": "echo '⚠️ Dropping all tables, re-running migrations, and seeding...' && npm run db:migrate:fresh && npm run db:seed:run",
+    "docker:up": "echo '🐳 Starting Docker Compose services in detached mode...' && docker-compose up -d",
+    "docker:down": "echo '🐳 Stopping and removing Docker Compose containers, networks...' && docker-compose down",
+    "docker:stop": "echo '🐳 Stopping Docker Compose services...' && docker-compose stop",
+    "docker:prune": "echo '☢️ WARNING: Stopping and removing containers AND VOLUMES (data will be lost!)...' && docker-compose down -v",
+    "docker:build": "echo '🐳 Building Docker Compose images...' && docker-compose build",
+    "docker:build:nc": "echo '🐳 Building Docker Compose images without cache...' && docker-compose build --no-cache",
+    "docker:ps": "echo '🐳 Listing Docker Compose containers...' && docker-compose ps",
+    "docker:logs": "echo '🐳 Following Docker Compose logs (Ctrl+C to stop)...' && docker-compose logs -f"
+  },
+  "keywords": [
+    "micro-stress",
+    "fastify",
+    "knex",
+    "opentelemetry",
+    "postgresql",
+    "boilerplate",
+    "microservice"
+  ],
+  "author": "heyjunin",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@fastify/sensible": "^5.6.0",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^4.0.0",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.52.1",
+    "@opentelemetry/instrumentation-fastify": "^0.36.1",
+    "@opentelemetry/instrumentation-http": "^0.52.1",
+    "@opentelemetry/instrumentation-knex": "^0.38.0",
+    "@opentelemetry/sdk-node": "^0.52.1",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.28.1",
+    "ioredis": "^5.6.1",
+    "knex": "^3.1.0",
+    "pg": "^8.12.0",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.7.0",
+    "@opentelemetry/instrumentation-ioredis": "^0.48.0",
+    "@types/supertest": "^6.0.3",
+    "pino-pretty": "^11.2.1",
+    "supertest": "^7.1.0",
+    "vitest": "^3.1.2",
+    "vitest-mock-extended": "^3.1.0"
+  }
+}
